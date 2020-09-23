@@ -123,7 +123,10 @@ sorted [] = True
 -- Use pattern matching and recursion (and the list constructors : and [])
 
 sumsOf :: [Int] -> [Int]
-sumsOf xs = todo
+sumsOf (x:xs:xss) = x:(sumsOf ((x + xs):xss))
+sumsOf [x] = [x]
+sumsOf [] = []
+
 ------------------------------------------------------------------------------
 -- Ex 7: implement the function merge that merges two sorted lists of
 -- Ints into a sorted list
@@ -135,7 +138,12 @@ sumsOf xs = todo
 --   merge [1,1,6] [1,2]   ==> [1,1,1,2,6]
 
 merge :: [Int] -> [Int] -> [Int]
-merge xs ys = todo
+merge (x:xs) (y:ys)
+    | (x < y) = x:(merge xs (y:ys))
+    | (y < x) = y:(merge (x:xs) ys)
+    | otherwise = x:y:(merge xs ys)
+merge x [] = x
+merge [] y = y
 
 ------------------------------------------------------------------------------
 -- Ex 8: define the function mymaximum that takes a list and a
@@ -154,7 +162,8 @@ merge xs ys = todo
 --     ==> [1,2]
 
 mymaximum :: (a -> a -> Bool) -> a -> [a] -> a
-mymaximum bigger initial xs = todo
+mymaximum bigger initial [] = initial
+mymaximum bigger initial (x:xs) = if (bigger x initial) then mymaximum bigger x xs else mymaximum bigger initial xs
 
 ------------------------------------------------------------------------------
 -- Ex 9: define a version of map that takes a two-argument function
@@ -168,7 +177,9 @@ mymaximum bigger initial xs = todo
 -- Use recursion and pattern matching. Do not use any library functions.
 
 map2 :: (a -> b -> c) -> [a] -> [b] -> [c]
-map2 f as bs = todo
+map2 f (a:as) (b:bs) = (f a b):(map2 f as bs)
+map2 f [] b = []
+map2 f a [] = []
 
 ------------------------------------------------------------------------------
 -- Ex 10: implement the function maybeMap, which works a bit like a
@@ -192,4 +203,11 @@ map2 f as bs = todo
 --   ==> []
 
 maybeMap :: (a -> Maybe b) -> [a] -> [b]
-maybeMap f xs = todo
+maybeMap f [] = []
+maybeMap f (x:xs) = maybeMap' f (xs) (f x)
+
+maybeMap' :: (a -> Maybe b) -> [a] -> Maybe b -> [b]
+maybeMap' f (a:as) (Just b) = b:(maybeMap' f as (f a))
+maybeMap' f (a:as) Nothing = (maybeMap' f as (f a))
+maybeMap' f [] (Just b) = [b]
+maybeMap' f [] Nothing = []
